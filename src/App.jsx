@@ -297,16 +297,16 @@ export default function App() {
           </div>
         </Card>
 
-        <div style={{ display: "grid", gridTemplateColumns: "0.9fr 1.1fr", gap: 20 }}>
-          <Card>
-            <h2 style={{ marginTop: 0, fontSize: 22 }}>Planning du jour</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "0.7fr 1.3fr", gap: 20 }}>
+          <Card style={{ padding: 14 }}>
+            <h2 style={{ marginTop: 0, fontSize: 18 }}>Planning du jour</h2>
             {dayPlan.length === 0 ? (
               <p style={{ color: "#64748b" }}>Aucun mouvement aujourd’hui.</p>
             ) : (
               dayPlan.map((item) => {
                 const palette = APARTMENT_COLORS[item.apartment];
                 return (
-                  <div key={item.id} style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 14, marginBottom: 10, background: palette.soft }}>
+                  <div key={item.id} style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 10, marginBottom: 10, background: palette.soft }}>
                     <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
                       <div style={{ fontWeight: 800, color: palette.text }}>{item.start} • {item.type}</div>
                       <div style={{ fontSize: 12, fontWeight: 700, color: palette.text }}>{item.apartment}</div>
@@ -319,11 +319,11 @@ export default function App() {
           </Card>
 
           <Card>
-            <h2 style={{ marginTop: 0, fontSize: 22 }}>Séjours visibles</h2>
+            <h2 style={{ marginTop: 0, fontSize: 18 }}>Séjours visibles</h2>
             {filteredReservations.map((r) => {
               const palette = APARTMENT_COLORS[r.apartment];
               return (
-                <div key={r.id} style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 14, marginBottom: 10, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
+                <div key={r.id} style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 10, marginBottom: 10, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                   <div>
                     <div style={{ fontWeight: 800 }}>{r.apartment}</div>
                     <div style={{ color: "#475569", marginTop: 4 }}>Du {formatDate(r.arrival)} au {formatDate(r.departure)}</div>
