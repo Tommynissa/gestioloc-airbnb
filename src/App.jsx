@@ -257,7 +257,7 @@ export default function App() {
                     ))}
                   </div>
 
-                  <div style={{ position: "absolute", left: 0, right: 0, top: 42, pointerEvents: "none" }}>
+                  <div style={{ position: "absolute", left: 0, right: 0, top: 42, pointerEvents: "none", overflow: "hidden" }}>
                     {weekBands.map((band, index) => {
                       const palette = APARTMENT_COLORS[band.apartment];
                       return (
@@ -267,6 +267,7 @@ export default function App() {
                             position: "absolute",
                             left: `calc(${band.startCol} * (100% / 7) + ${band.startCol * 8}px + 6px)`,
                             width: `calc(${band.spanDays} * (100% / 7) + ${(band.spanDays - 1) * 8}px - 12px)`,
+                            maxWidth: `calc(100% - (${band.startCol} * (100% / 7) + ${band.startCol * 8}px + 6px))`,
                             transform: `translateY(${index * 30}px)`,
                             height: 28,
                             borderRadius: 999,
@@ -285,8 +286,8 @@ export default function App() {
                             opacity: 0.97,
                           }}
                         >
-                          <span>{band.apartment}</span>
-                          <span style={{ opacity: 0.92 }}>{formatDate(band.arrival).slice(0, 5)} → {formatDate(band.departure).slice(0, 5)}</span>
+                          <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{band.apartment}</span>
+                          <span style={{ opacity: 0.92, marginLeft: 10, flexShrink: 0 }}>{formatDate(band.arrival).slice(0, 5)} → {formatDate(band.departure).slice(0, 5)}</span>
                         </div>
                       );
                     })}
