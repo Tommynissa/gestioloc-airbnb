@@ -2,10 +2,10 @@ import React, { useMemo, useState } from "react";
 
 const APARTMENTS = ["Fabron", "Juan", "Killian", "Swan"];
 const APARTMENT_COLORS = {
-  Fabron: "#2563eb",
-  Juan: "#16a34a",
-  Killian: "#dc2626",
-  Swan: "#a855f7",
+  Fabron: { solid: "#2563eb", soft: "#dbeafe", text: "#1d4ed8" },
+  Juan: { solid: "#16a34a", soft: "#dcfce7", text: "#15803d" },
+  Killian: { solid: "#dc2626", soft: "#fee2e2", text: "#b91c1c" },
+  Swan: { solid: "#a855f7", soft: "#f3e8ff", text: "#9333ea" },
 };
 
 function todayISO() {
@@ -94,6 +94,8 @@ function buildReservationBands(month, reservations, apartmentFilter) {
             week,
             startCol,
             spanDays,
+            arrival: reservation.arrival,
+            departure: reservation.departure,
           });
         }
       }
@@ -102,15 +104,16 @@ function buildReservationBands(month, reservations, apartmentFilter) {
   return bands;
 }
 
-function Card({ children }) {
+function Card({ children, style }) {
   return (
     <div
       style={{
         background: "white",
         border: "1px solid #e5e7eb",
-        borderRadius: 18,
-        padding: 18,
-        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+        borderRadius: 22,
+        padding: 20,
+        boxShadow: "0 8px 24px rgba(15,23,42,0.05)",
+        ...style,
       }}
     >
       {children}
@@ -125,6 +128,7 @@ export default function App() {
     { id: 3, apartment: "Killian", guest: "Airbnb", arrival: "2026-04-11", departure: "2026-04-16" },
     { id: 4, apartment: "Swan", guest: "Airbnb", arrival: "2026-04-18", departure: "2026-04-22" },
     { id: 5, apartment: "Fabron", guest: "Airbnb", arrival: "2026-04-23", departure: "2026-04-28" },
+    { id: 6, apartment: "Juan", guest: "Airbnb", arrival: "2026-04-24", departure: "2026-04-29" },
   ]);
 
   const [month, setMonth] = useState(new Date("2026-04-01"));
@@ -144,66 +148,80 @@ export default function App() {
   const arrivals = planning.filter((p) => p.date === today && p.type === "Check-in");
   const departures = planning.filter((p) => p.date === today && p.type === "Check-out");
   const cleaning = planning.filter((p) => p.date === today && p.type === "Ménage");
+  const dayPlan = planning.filter((p) => p.date === today).sort((a, b) => a.start.localeCompare(b.start));
 
   return (
-    <div style={{ padding: 20, fontFamily: "Arial, sans-serif", background: "#f8fafc", minHeight: "100vh" }}>
-      <div style={{ maxWidth: 1320, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, marginBottom: 24 }}>
+    <div
+      style={{
+        padding: 24,
+        fontFamily: "Inter, Arial, sans-serif",
+        background: "linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%)",
+        minHeight: "100vh",
+        color: "#0f172a",
+      }}
+    >
+      <div style={{ maxWidth: 1380, margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, marginBottom: 24, flexWrap: "wrap" }}>
           <div>
-            <div style={{ color: "#64748b", textTransform: "uppercase", letterSpacing: 2, fontSize: 12 }}>Gestion Airbnb</div>
-            <h1 style={{ margin: "8px 0 6px", fontSize: 36 }}>Calendrier mensuel des appartements</h1>
-            <p style={{ margin: 0, color: "#475569" }}>Vue type Airbnb avec bandes couleur par appartement.</p>
+            <div style={{ color: "#64748b", textTransform: "uppercase", letterSpacing: 2, fontSize: 12, fontWeight: 700 }}>Gestion Airbnb</div>
+            <h1 style={{ margin: "8px 0 6px", fontSize: 40, lineHeight: 1.05 }}>Calendrier mensuel premium</h1>
+            <p style={{ margin: 0, color: "#475569", fontSize: 16 }}>Vue inspirée d’Airbnb avec bandes de séjour colorées par appartement.</p>
           </div>
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <select
               value={selectedApartment}
               onChange={(e) => setSelectedApartment(e.target.value)}
-              style={{ padding: 10, borderRadius: 10, border: "1px solid #cbd5e1" }}
+              style={{ padding: 12, borderRadius: 14, border: "1px solid #cbd5e1", background: "white", minWidth: 170 }}
             >
               <option>Tous</option>
               {APARTMENTS.map((a) => (
                 <option key={a}>{a}</option>
               ))}
             </select>
+            <button style={{ border: 0, background: "#0f172a", color: "white", borderRadius: 14, padding: "12px 16px", fontWeight: 700, cursor: "pointer" }}>
+              Synchroniser les calendriers
+            </button>
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
-          <Card>
-            <div style={{ color: "#64748b", fontSize: 14 }}>Arrivées aujourd’hui</div>
-            <div style={{ fontSize: 30, fontWeight: 700, marginTop: 8 }}>{arrivals.length}</div>
-          </Card>
-          <Card>
-            <div style={{ color: "#64748b", fontSize: 14 }}>Départs aujourd’hui</div>
-            <div style={{ fontSize: 30, fontWeight: 700, marginTop: 8 }}>{departures.length}</div>
-          </Card>
-          <Card>
-            <div style={{ color: "#64748b", fontSize: 14 }}>Ménages aujourd’hui</div>
-            <div style={{ fontSize: 30, fontWeight: 700, marginTop: 8 }}>{cleaning.length}</div>
-          </Card>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 16, marginBottom: 22 }}>
+          {[
+            ["Arrivées aujourd’hui", arrivals.length],
+            ["Départs aujourd’hui", departures.length],
+            ["Ménages aujourd’hui", cleaning.length],
+            ["Séjours visibles", filteredReservations.length],
+          ].map(([label, value]) => (
+            <Card key={label}>
+              <div style={{ color: "#64748b", fontSize: 14, fontWeight: 600 }}>{label}</div>
+              <div style={{ fontSize: 34, fontWeight: 800, marginTop: 8 }}>{value}</div>
+            </Card>
+          ))}
         </div>
 
-        <Card>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <h2 style={{ margin: 0, fontSize: 24, textTransform: "capitalize" }}>{monthLabel(month)}</h2>
+        <Card style={{ marginBottom: 22, overflow: "hidden" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, gap: 16, flexWrap: "wrap" }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 26, textTransform: "capitalize" }}>{monthLabel(month)}</h2>
+              <div style={{ color: "#64748b", marginTop: 6 }}>Lecture visuelle des séjours comme sur une vue calendrier de location.</div>
+            </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setMonth(addDays(month, -30))} style={{ border: "1px solid #cbd5e1", background: "white", borderRadius: 10, padding: "10px 12px", cursor: "pointer" }}>Précédent</button>
-              <button onClick={() => setMonth(addDays(month, 30))} style={{ border: "1px solid #cbd5e1", background: "white", borderRadius: 10, padding: "10px 12px", cursor: "pointer" }}>Suivant</button>
+              <button onClick={() => setMonth(addDays(month, -30))} style={{ border: "1px solid #cbd5e1", background: "white", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 600 }}>Précédent</button>
+              <button onClick={() => setMonth(addDays(month, 30))} style={{ border: "1px solid #cbd5e1", background: "white", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 600 }}>Suivant</button>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 18 }}>
             {APARTMENTS.map((apartment) => (
-              <div key={apartment} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
-                <span style={{ width: 14, height: 14, borderRadius: 999, background: APARTMENT_COLORS[apartment], display: "inline-block" }} />
+              <div key={apartment} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 700, color: "#334155" }}>
+                <span style={{ width: 14, height: 14, borderRadius: 999, background: APARTMENT_COLORS[apartment].solid, display: "inline-block" }} />
                 {apartment}
               </div>
             ))}
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8, marginBottom: 10, color: "#64748b", fontSize: 13, fontWeight: 700 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8, marginBottom: 12, color: "#64748b", fontSize: 13, fontWeight: 700 }}>
             {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
-              <div key={day}>{day}</div>
+              <div key={day} style={{ paddingLeft: 4 }}>{day}</div>
             ))}
           </div>
 
@@ -219,17 +237,18 @@ export default function App() {
                       <div
                         key={day.date}
                         style={{
-                          border: day.date === today ? "2px solid #111827" : "1px solid #d1d5db",
-                          borderRadius: 14,
-                          padding: 10,
-                          minHeight: 118,
-                          background: day.inMonth ? "white" : "#f5f5f5",
+                          border: day.date === today ? "2px solid #111827" : "1px solid #dbe3ee",
+                          borderRadius: 18,
+                          padding: 12,
+                          minHeight: 138,
+                          background: day.inMonth ? "white" : "#f8fafc",
+                          boxShadow: day.date === today ? "0 0 0 3px rgba(17,24,39,0.05)" : "none",
                         }}
                       >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                          <div style={{ fontWeight: "bold", color: day.inMonth ? "#111827" : "#9ca3af" }}>{day.date.slice(8, 10)}</div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                          <div style={{ fontWeight: 800, color: day.inMonth ? "#111827" : "#9ca3af", fontSize: 15 }}>{day.date.slice(8, 10)}</div>
                           {day.date === today ? (
-                            <div style={{ fontSize: 10, background: "#111827", color: "white", borderRadius: 999, padding: "3px 7px" }}>
+                            <div style={{ fontSize: 10, background: "#111827", color: "white", borderRadius: 999, padding: "4px 8px", fontWeight: 700 }}>
                               Aujourd’hui
                             </div>
                           ) : null}
@@ -238,34 +257,39 @@ export default function App() {
                     ))}
                   </div>
 
-                  <div style={{ position: "absolute", left: 0, right: 0, top: 34, pointerEvents: "none" }}>
-                    {weekBands.map((band, index) => (
-                      <div
-                        key={band.id}
-                        style={{
-                          position: "absolute",
-                          left: `calc(${band.startCol} * (100% / 7) + ${band.startCol * 8}px)`,
-                          width: `calc(${band.spanDays} * (100% / 7) + ${(band.spanDays - 1) * 8}px)`,
-                          transform: `translateY(${index * 28}px)`,
-                          height: 24,
-                          borderRadius: 999,
-                          background: APARTMENT_COLORS[band.apartment],
-                          color: "white",
-                          display: "flex",
-                          alignItems: "center",
-                          padding: "0 10px",
-                          fontSize: 12,
-                          fontWeight: 700,
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.18)",
-                          overflow: "hidden",
-                          whiteSpace: "nowrap",
-                          textOverflow: "ellipsis",
-                          opacity: 0.95,
-                        }}
-                      >
-                        {band.apartment}
-                      </div>
-                    ))}
+                  <div style={{ position: "absolute", left: 0, right: 0, top: 42, pointerEvents: "none" }}>
+                    {weekBands.map((band, index) => {
+                      const palette = APARTMENT_COLORS[band.apartment];
+                      return (
+                        <div
+                          key={band.id}
+                          style={{
+                            position: "absolute",
+                            left: `calc(${band.startCol} * (100% / 7) + ${band.startCol * 8}px + 6px)`,
+                            width: `calc(${band.spanDays} * (100% / 7) + ${(band.spanDays - 1) * 8}px - 12px)`,
+                            transform: `translateY(${index * 30}px)`,
+                            height: 28,
+                            borderRadius: 999,
+                            background: palette.solid,
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "0 12px",
+                            fontSize: 12,
+                            fontWeight: 800,
+                            boxShadow: "0 8px 18px rgba(15,23,42,0.14)",
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                            textOverflow: "ellipsis",
+                            opacity: 0.97,
+                          }}
+                        >
+                          <span>{band.apartment}</span>
+                          <span style={{ opacity: 0.92 }}>{formatDate(band.arrival).slice(0, 5)} → {formatDate(band.departure).slice(0, 5)}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -273,29 +297,45 @@ export default function App() {
           </div>
         </Card>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "0.9fr 1.1fr", gap: 20 }}>
           <Card>
             <h2 style={{ marginTop: 0, fontSize: 22 }}>Planning du jour</h2>
-            {planning.filter((p) => p.date === today).length === 0 ? (
+            {dayPlan.length === 0 ? (
               <p style={{ color: "#64748b" }}>Aucun mouvement aujourd’hui.</p>
             ) : (
-              planning.filter((p) => p.date === today).map((item) => (
-                <div key={item.id} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, marginBottom: 10 }}>
-                  <div style={{ fontWeight: 700 }}>{item.start} • {item.type}</div>
-                  <div style={{ color: "#475569", marginTop: 4 }}>{item.apartment} • {item.guest}</div>
-                </div>
-              ))
+              dayPlan.map((item) => {
+                const palette = APARTMENT_COLORS[item.apartment];
+                return (
+                  <div key={item.id} style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 14, marginBottom: 10, background: palette.soft }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                      <div style={{ fontWeight: 800, color: palette.text }}>{item.start} • {item.type}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: palette.text }}>{item.apartment}</div>
+                    </div>
+                    <div style={{ color: "#475569", marginTop: 6 }}>{item.guest}</div>
+                  </div>
+                );
+              })
             )}
           </Card>
 
           <Card>
-            <h2 style={{ marginTop: 0, fontSize: 22 }}>Réservations</h2>
-            {filteredReservations.map((r) => (
-              <div key={r.id} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, marginBottom: 10 }}>
-                <div style={{ fontWeight: 700 }}>{r.apartment}</div>
-                <div style={{ color: "#475569", marginTop: 4 }}>Du {formatDate(r.arrival)} au {formatDate(r.departure)}</div>
-              </div>
-            ))}
+            <h2 style={{ marginTop: 0, fontSize: 22 }}>Séjours visibles</h2>
+            {filteredReservations.map((r) => {
+              const palette = APARTMENT_COLORS[r.apartment];
+              return (
+                <div key={r.id} style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 14, marginBottom: 10, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontWeight: 800 }}>{r.apartment}</div>
+                    <div style={{ color: "#475569", marginTop: 4 }}>Du {formatDate(r.arrival)} au {formatDate(r.departure)}</div>
+                  </div>
+                  <div style={{ minWidth: 92, textAlign: "right" }}>
+                    <div style={{ background: palette.soft, color: palette.text, border: `1px solid ${palette.solid}33`, borderRadius: 999, padding: "6px 10px", fontWeight: 700, fontSize: 12 }}>
+                      {r.guest}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </Card>
         </div>
       </div>
