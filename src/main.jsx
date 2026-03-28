@@ -25,7 +25,7 @@ function App() {
 
     if (error) {
       console.error("Erreur chargement réservations:", error);
-      alert("Erreur chargement réservations : " + error.message);
+      alert("Erreur chargement réservations : " + JSON.stringify(error));
       return;
     }
 
@@ -41,7 +41,7 @@ function App() {
 
     if (error) {
       console.error("Erreur chargement planning:", error);
-      alert("Erreur chargement planning : " + error.message);
+      alert("Erreur chargement planning : " + JSON.stringify(error));
       return;
     }
 
@@ -73,7 +73,7 @@ function App() {
 
     if (error) {
       console.error("Erreur ajout réservation:", error);
-      alert("Erreur lors de l'ajout de la réservation : " + error.message);
+      alert("Erreur ajout réservation : " + JSON.stringify(error));
       return;
     }
 
@@ -82,7 +82,6 @@ function App() {
     if (reservation) {
       const planningItems = [
         {
-          reservation_id: reservation.id,
           appartement: reservation.appartement,
           nom: reservation.nom,
           date: reservation.arrivee,
@@ -91,7 +90,6 @@ function App() {
           heure_fin: "16:00",
         },
         {
-          reservation_id: reservation.id,
           appartement: reservation.appartement,
           nom: reservation.nom,
           date: reservation.depart,
@@ -100,7 +98,6 @@ function App() {
           heure_fin: "11:00",
         },
         {
-          reservation_id: reservation.id,
           appartement: reservation.appartement,
           nom: reservation.nom,
           date: reservation.depart,
@@ -116,7 +113,7 @@ function App() {
 
       if (planningError) {
         console.error("Erreur création planning:", planningError);
-        alert("Erreur planning : " + planningError.message);
+        alert("Erreur planning complète : " + JSON.stringify(planningError));
       }
     }
 
@@ -132,17 +129,6 @@ function App() {
   }
 
   async function deleteReservation(id) {
-    const { error: planningError } = await supabase
-      .from("planning")
-      .delete()
-      .eq("reservation_id", id);
-
-    if (planningError) {
-      console.error("Erreur suppression planning:", planningError);
-      alert("Erreur suppression planning : " + planningError.message);
-      return;
-    }
-
     const { error } = await supabase
       .from("reservations")
       .delete()
@@ -150,7 +136,7 @@ function App() {
 
     if (error) {
       console.error("Erreur suppression réservation:", error);
-      alert("Erreur suppression réservation : " + error.message);
+      alert("Erreur suppression réservation : " + JSON.stringify(error));
       return;
     }
 
