@@ -13,6 +13,7 @@
     "react-dom": "^18.2.0",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.446.0"
+    "@supabase/supabase-js": "^2.56.0"
   },
   "devDependencies": {
     "vite": "^5.0.0",
