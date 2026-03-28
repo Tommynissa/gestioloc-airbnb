@@ -112,9 +112,9 @@ function App() {
         .insert(planningItems);
 
       if (planningError) {
-        console.error(planningError);
-        alert("Réservation ajoutée, mais erreur lors de la création du planning.");
-      }
+  console.error(planningError);
+  alert("Erreur planning : " + planningError.message);
+}
     }
 
     setForm({
