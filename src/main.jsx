@@ -24,7 +24,8 @@ function App() {
       .order("arrivee", { ascending: true });
 
     if (error) {
-      console.error(error);
+      console.error("Erreur chargement réservations:", error);
+      alert("Erreur chargement réservations : " + error.message);
       return;
     }
 
@@ -39,7 +40,8 @@ function App() {
       .order("heure_debut", { ascending: true });
 
     if (error) {
-      console.error(error);
+      console.error("Erreur chargement planning:", error);
+      alert("Erreur chargement planning : " + error.message);
       return;
     }
 
@@ -70,12 +72,13 @@ function App() {
       .select();
 
     if (error) {
-      console.error(error);
-      alert("Erreur lors de l'ajout");
+      console.error("Erreur ajout réservation:", error);
+      alert("Erreur lors de l'ajout de la réservation : " + error.message);
       return;
     }
 
     const reservation = data?.[0];
+
     if (reservation) {
       const planningItems = [
         {
@@ -112,9 +115,9 @@ function App() {
         .insert(planningItems);
 
       if (planningError) {
-  console.error(planningError);
-  alert("Erreur planning : " + planningError.message);
-}
+        console.error("Erreur création planning:", planningError);
+        alert("Erreur planning : " + planningError.message);
+      }
     }
 
     setForm({
@@ -135,7 +138,9 @@ function App() {
       .eq("reservation_id", id);
 
     if (planningError) {
-      console.error(planningError);
+      console.error("Erreur suppression planning:", planningError);
+      alert("Erreur suppression planning : " + planningError.message);
+      return;
     }
 
     const { error } = await supabase
@@ -144,8 +149,8 @@ function App() {
       .eq("id", id);
 
     if (error) {
-      console.error(error);
-      alert("Erreur lors de la suppression");
+      console.error("Erreur suppression réservation:", error);
+      alert("Erreur suppression réservation : " + error.message);
       return;
     }
 
