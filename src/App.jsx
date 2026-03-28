@@ -160,11 +160,11 @@ export default function App() {
         color: "#0f172a",
       }}
     >
-      <div style={{ maxWidth: 1380, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, marginBottom: 24, flexWrap: "wrap" }}>
           <div>
             <div style={{ color: "#64748b", textTransform: "uppercase", letterSpacing: 2, fontSize: 12, fontWeight: 700 }}>Gestion Airbnb</div>
-            <h1 style={{ margin: "8px 0 6px", fontSize: 40, lineHeight: 1.05 }}>Calendrier mensuel premium</h1>
+            <h1 style={{ margin: "8px 0 6px", fontSize: 32, lineHeight: 1.05 }}>Calendrier mensuel premium</h1>
             <p style={{ margin: 0, color: "#475569", fontSize: 16 }}>Vue inspirée d’Airbnb avec bandes de séjour colorées par appartement.</p>
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -297,9 +297,9 @@ export default function App() {
           </div>
         </Card>
 
-        <div style={{ display: "grid", gridTemplateColumns: "0.7fr 1.3fr", gap: 20 }}>
-          <Card style={{ padding: 14 }}>
-            <h2 style={{ marginTop: 0, fontSize: 18 }}>Planning du jour</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "0.5fr 1fr", gap: 20 }}>
+          <Card style={{ padding: 10, fontSize: 13 }}>
+            <h2 style={{ marginTop: 0, fontSize: 16 }}>Planning du jour</h2>
             {dayPlan.length === 0 ? (
               <p style={{ color: "#64748b" }}>Aucun mouvement aujourd’hui.</p>
             ) : (
@@ -319,7 +319,7 @@ export default function App() {
           </Card>
 
           <Card>
-            <h2 style={{ marginTop: 0, fontSize: 18 }}>Séjours visibles</h2>
+            <h2 style={{ marginTop: 0, fontSize: 16 }}>Séjours visibles</h2>
             {filteredReservations.map((r) => {
               const palette = APARTMENT_COLORS[r.apartment];
               return (
