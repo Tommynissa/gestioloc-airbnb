@@ -18,32 +18,20 @@ function App() {
   });
 
   async function loadReservations() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("reservations")
       .select("*")
       .order("arrivee", { ascending: true });
-
-    if (error) {
-      console.error("Erreur chargement réservations:", error);
-      alert("Erreur chargement réservations : " + JSON.stringify(error));
-      return;
-    }
 
     setReservations(data || []);
   }
 
   async function loadPlanning() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("planning")
       .select("*")
       .order("date", { ascending: true })
       .order("heure_debut", { ascending: true });
-
-    if (error) {
-      console.error("Erreur chargement planning:", error);
-      alert("Erreur chargement planning : " + JSON.stringify(error));
-      return;
-    }
 
     setPlanning(data || []);
   }
@@ -72,8 +60,7 @@ function App() {
       .select();
 
     if (error) {
-      console.error("Erreur ajout réservation:", error);
-      alert("Erreur ajout réservation : " + JSON.stringify(error));
+      alert("Erreur lors de l'ajout de la réservation.");
       return;
     }
 
@@ -112,8 +99,7 @@ function App() {
         .insert(planningItems);
 
       if (planningError) {
-        console.error("Erreur création planning:", planningError);
-        alert("Erreur planning complète : " + JSON.stringify(planningError));
+        alert("Réservation ajoutée, mais erreur lors de la création du planning.");
       }
     }
 
@@ -129,50 +115,24 @@ function App() {
   }
 
   async function deleteReservation(id) {
-    const { error } = await supabase
-      .from("reservations")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      console.error("Erreur suppression réservation:", error);
-      alert("Erreur suppression réservation : " + JSON.stringify(error));
-      return;
-    }
+    await supabase.from("planning").delete().eq("reservation_id", id);
+    await supabase.from("reservations").delete().eq("id", id);
 
     loadReservations();
     loadPlanning();
   }
 
   return (
-    <div
-      style={{
-        padding: 20,
-        maxWidth: 1100,
-        margin: "0 auto",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
+    <div style={{ padding: 20, maxWidth: 1100, margin: "0 auto" }}>
       <h1>GestioLoc Airbnb</h1>
       <p>Réservations + planning automatique 🚀</p>
 
-      <form
-        onSubmit={addReservation}
-        style={{
-          display: "grid",
-          gap: 10,
-          marginBottom: 30,
-          padding: 16,
-          border: "1px solid #ddd",
-          borderRadius: 10,
-        }}
-      >
-        <h2 style={{ margin: 0 }}>Ajouter une réservation</h2>
+      <form onSubmit={addReservation} style={{ marginBottom: 30 }}>
+        <h2>Ajouter une réservation</h2>
 
         <select
           value={form.appartement}
           onChange={(e) => setForm({ ...form, appartement: e.target.value })}
-          style={{ padding: 10 }}
         >
           <option>Fabron</option>
           <option>Juan</option>
@@ -181,87 +141,56 @@ function App() {
         </select>
 
         <input
-          placeholder="Nom du voyageur"
+          placeholder="Nom"
           value={form.nom}
           onChange={(e) => setForm({ ...form, nom: e.target.value })}
-          style={{ padding: 10 }}
         />
 
         <input
           type="date"
           value={form.arrivee}
           onChange={(e) => setForm({ ...form, arrivee: e.target.value })}
-          style={{ padding: 10 }}
         />
 
         <input
           type="date"
           value={form.depart}
           onChange={(e) => setForm({ ...form, depart: e.target.value })}
-          style={{ padding: 10 }}
         />
 
-        <button type="submit" style={{ padding: 12 }}>
-          Ajouter la réservation
-        </button>
+        <button type="submit">Ajouter</button>
       </form>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 30 }}>
-        <div>
+      <div style={{ display: "flex", gap: 30 }}>
+        <div style={{ flex: 1 }}>
           <h2>Réservations</h2>
-
-          {reservations.length === 0 ? (
-            <p>Aucune réservation.</p>
-          ) : (
-            reservations.map((r) => (
-              <div
-                key={r.id}
-                style={{
-                  border: "1px solid #ddd",
-                  borderRadius: 10,
-                  padding: 12,
-                  marginBottom: 10,
-                }}
-              >
-                <strong>{r.nom}</strong>
-                <p>Appartement : {r.appartement}</p>
-                <p>
-                  Du {r.arrivee} au {r.depart}
-                </p>
-                <button onClick={() => deleteReservation(r.id)}>
-                  Supprimer
-                </button>
-              </div>
-            ))
-          )}
+          {reservations.map((r) => (
+            <div key={r.id}>
+              <strong>{r.nom}</strong>
+              <p>{r.appartement}</p>
+              <p>
+                {r.arrivee} → {r.depart}
+              </p>
+              <button onClick={() => deleteReservation(r.id)}>
+                Supprimer
+              </button>
+            </div>
+          ))}
         </div>
 
-        <div>
+        <div style={{ flex: 1 }}>
           <h2>Planning</h2>
-
-          {planning.length === 0 ? (
-            <p>Aucun planning.</p>
-          ) : (
-            planning.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  border: "1px solid #ddd",
-                  borderRadius: 10,
-                  padding: 12,
-                  marginBottom: 10,
-                }}
-              >
-                <strong>{item.type}</strong>
-                <p>{item.nom}</p>
-                <p>Appartement : {item.appartement}</p>
-                <p>Date : {item.date}</p>
-                <p>
-                  Heure : {item.heure_debut} → {item.heure_fin}
-                </p>
-              </div>
-            ))
-          )}
+          {planning.map((p) => (
+            <div key={p.id}>
+              <strong>{p.type}</strong>
+              <p>{p.nom}</p>
+              <p>{p.appartement}</p>
+              <p>{p.date}</p>
+              <p>
+                {p.heure_debut} → {p.heure_fin}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
